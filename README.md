@@ -6,7 +6,7 @@ Copies the content of text files, regardless of extension
 Useful for working on a large codebase with ai chat assistance (copilot is really bad at writing good code, unlike chatGPT or Gemini). With this tool you will be able to send a file containing all the relevant parts of the codebase quickly and easily, without having to open a bunch of files and copy them one by one, or searching for all the files you want to send in countless subdirectories.
 
 **Usage:**
-Select a directory, right click to open context menu, and click on 'Combine Text Files' \(on windows 11 you might have to press 'Show More Options' first)
+Select a directory, right click to open context menu, and click on 'Combine Text Files' \(on windows 11 you might have to press 'Show More Options' first). The output will be in your clipboard and on your desktop, in a file named *[dirname]*_combined.txt
 
 **Setup:**
 1. Download CombineTextFiles.ps1 - this is the script, and place it in "C:\Scripts\" folder
