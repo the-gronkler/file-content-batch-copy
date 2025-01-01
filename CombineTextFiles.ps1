@@ -8,7 +8,6 @@ if (-not (Test-Path $directory)) {
     exit
 }
 
-
 # Initialize an empty string to store the combined content
 $combinedContent = ""
 
@@ -24,38 +23,43 @@ if (Test-Path $excludeFilePath) {
     Write-Host "Exclude file found, reading excluded files and directories..."
     $excludeLines = Get-Content -Path $excludeFilePath
     foreach ($line in $excludeLines) {
-        if (Test-Path $line) {
-            if ((Get-Item $line).PSIsContainer) {
-                $excludedDirs += $line
+        # Trim leading and trailing spaces, and remove quotes around paths
+        $line = $line.Trim().Trim('"')
+
+        # Skip empty lines
+        if (-not [string]::IsNullOrWhiteSpace($line)) {
+            if (Test-Path $line) {
+                if ((Get-Item $line).PSIsContainer) {
+                    $excludedDirs += $line
+                } else {
+                    $excludedFiles += $line
+                }
             } else {
-                $excludedFiles += $line
+                Write-Host "Warning: Exclude path does not exist: $line"
             }
         }
     }
 }
 
-# Get all files in the selected directory (including subdirectories)
-$files = Get-ChildItem -Path $directory -File -Recurse
-
-foreach ($file in $files) {
-    # Check if the file is in the excluded files list
-    if ($excludedFiles -contains $file.FullName) {
-        Write-Host "Skipping excluded file: $($file.FullName)"
-        continue
-    }
-
-    # Check if the file is in a directory that's excluded
-    $excludeDirMatch = $false
+# Get all files in the selected directory (including subdirectories), but exclude files in excluded directories
+$allFiles = Get-ChildItem -Path $directory -File -Recurse
+$filteredFiles = $allFiles | Where-Object {
+    # Skip files in excluded directories
+    $inExcludedDir = $false
     foreach ($excludeDir in $excludedDirs) {
-        if ($file.FullName -like "$excludeDir\*") {
-            $excludeDirMatch = $true
-            Write-Host "Skipping file in excluded directory: $($file.FullName)"
+        if ($_.FullName.StartsWith($excludeDir)) {
+            $inExcludedDir = $true
             break
         }
     }
+    # Return the file if it's not in an excluded directory and it's not an excluded file
+    -not $inExcludedDir -and (-not ($excludedFiles -contains $_.FullName))
+}
 
-    if ($excludeDirMatch) { continue }
+$filesProcessed = 0
 
+# Iterate over the filtered list of files
+foreach ($file in $filteredFiles) {
     # Resolve the file path
     $resolvedPath = Resolve-Path $file.FullName -ErrorAction SilentlyContinue
     if ($resolvedPath) {
@@ -63,6 +67,10 @@ foreach ($file in $files) {
         $fileContent = Get-Content -Path $resolvedPath -Raw
         # Append file path and content to combined content with proper CRLF
         $combinedContent += "`r`n[$resolvedPath]:`r`n$fileContent`r`n`r`n"
+        
+        # Print each copied file
+        Write-Host "Copied file: $resolvedPath"
+        $filesProcessed++
     } else {
         $combinedContent += "`r`n[$file]: File not found`r`n`r`n"
     }
@@ -87,5 +95,5 @@ if ($combinedContent.Length -gt 0) {
     Write-Host "No content to copy to clipboard."
 }
 
-# Print how files, lines, tokens are copied
-Write-Host "Combined content from $($files.Count) files copied to clipboard with $($combinedContent.Split("`n").Count) lines and $($combinedContent.Split(" ").Count) tokens. Have a nice day :D"
+# Print how many files were processed and the details of combined content
+Write-Host "Processed $filesProcessed files. Combined content copied to clipboard with $($combinedContent.Split("`n").Count) lines and $($combinedContent.Split(" ").Count) tokens. Have a nice day :D"
