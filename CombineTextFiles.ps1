@@ -76,6 +76,19 @@ foreach ($file in $filteredFiles) {
     }
 }
 
+# Save the combined content to a file on the Desktop
+$desktopPath = [environment]::GetFolderPath("Desktop")
+$directoryName = Split-Path -Path $directory -Leaf
+$outputFilePath = Join-Path -Path $desktopPath -ChildPath "${directoryName}_combined.txt"
+
+try {
+    Set-Content -Path $outputFilePath -Value $combinedContent -Force
+    Write-Host "Combined content saved to file: $outputFilePath"
+}
+catch {
+    Write-Host "Failed to save the combined content to file: $outputFilePath"
+}
+
 # Double-check that the combined content is valid and fully captured
 if ($combinedContent.Length -gt 0) {
     try {
@@ -95,5 +108,13 @@ if ($combinedContent.Length -gt 0) {
     Write-Host "No content to copy to clipboard."
 }
 
+$combinedContentSizeInBytes = [System.Text.Encoding]::UTF8.GetByteCount($combinedContent)
+$combinedContentSizeInMB = [math]::Round($combinedContentSizeInBytes / 1MB, 2)
+
 # Print how many files were processed and the details of combined content
-Write-Host "Processed $filesProcessed files. Combined content copied to clipboard with $($combinedContent.Split("`n").Count) lines and $($combinedContent.Split(" ").Count) tokens. Have a nice day :D"
+Write-Host "Processed $filesProcessed files. 
+Combined content copied to clipboard and saved to file '${directoryName}_combined.txt' on your Desktop.
+with $($combinedContent.Split("`n").Count) lines, 
+$($combinedContent.Split(" ").Count) tokens, 
+and weighing $combinedContentSizeInMB MB.
+Have a nice day! :D"
