@@ -1,7 +1,7 @@
 # file-content-batch-copy
 
 (Windows) Add a context menu command to directories, which will copy the content of all files in this directory to clipboard, and to a .txt file on your Desktop ;) \
-Copies the content of text files, regardless of extension
+Copies the content of text files, regardless of extension (how to exclude files below)
 
 Useful for working on a large codebase with ai chat assistance (copilot is really bad at writing good code, unlike chatGPT or Gemini). With this tool you will be able to send a file containing all the relevant parts of the codebase quickly and easily, without having to open a bunch of files and copy them one by one, or searching for all the files you want to send in countless subdirectories.
 
