@@ -1,6 +1,6 @@
 # file-content-batch-copy
 
-(Windows) Add a context menu command to directories, which will copy the content of all files in this directory to clipboard ;) \
+(Windows) Add a context menu command to directories, which will copy the content of all files in this directory to clipboard, and to a .txt file on your Desktop ;) \
 Copies the content of text files, regardless of extension
 
 **Usage:**
